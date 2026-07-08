@@ -1,0 +1,18 @@
+# Render blueprint — one-click deploy of the branded Docker image.
+# In Render: New → Blueprint → point at this repo. Then set ANTHROPIC_API_KEY
+# in the dashboard (marked sync:false so it isn't stored in the repo).
+services:
+  - type: web
+    name: privacy-scan
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter            # scans run real Chromium — starter (512MB) or higher
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 5273
+      - key: NODE_ENV
+        value: production
+      - key: ANTHROPIC_API_KEY
+        sync: false          # set in the Render dashboard; enables AI narrative
