@@ -1,0 +1,35 @@
+{
+  "name": "privacy-scan",
+  "version": "2.0.0",
+  "description": "efelle Privacy Scan — loads a site in a clean browser session and audits it for third-party trackers, pre-consent cookies, and privacy-policy hygiene, then produces a branded report + PDF.",
+  "type": "module",
+  "bin": {
+    "privacy-scan": "bin/privacy-scan.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "scan": "node bin/privacy-scan.js",
+    "postinstall": "playwright install chromium"
+  },
+  "keywords": [
+    "privacy",
+    "gdpr",
+    "consent",
+    "cookies",
+    "tracking",
+    "playwright",
+    "audit",
+    "efelle"
+  ],
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
+    "express": "^4.21.2",
+    "playwright": "^1.48.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

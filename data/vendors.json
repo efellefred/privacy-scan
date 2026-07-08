@@ -1,0 +1,135 @@
+{
+  "$schema": "Vendor detection database. A vendor matches when a request host is (or is a subdomain of) one of its `domains`, OR a request URL contains one of its `urlPatterns`, OR a cookie name matches one of its `cookiePatterns`. Keep urlPatterns DISTINCTIVE (unique filenames/signatures) — generic paths like '/collect' or '/track' cause cross-vendor false positives.",
+  "vendors": [
+    {
+      "id": "google-analytics",
+      "name": "Google Analytics",
+      "category": "Analytics",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["google-analytics.com", "analytics.google.com"],
+      "urlPatterns": ["/g/collect", "google-analytics.com/collect", "/analytics.js", "/ga.js"],
+      "cookiePatterns": ["^_ga", "^_gid", "^_gat", "^__utm"]
+    },
+    {
+      "id": "google-tag-manager",
+      "name": "Google Tag Manager",
+      "category": "Tag Manager",
+      "setsCookies": false,
+      "requiresConsent": true,
+      "domains": ["googletagmanager.com"],
+      "urlPatterns": ["/gtm.js", "/gtag/js"],
+      "cookiePatterns": ["^_gcl"]
+    },
+    {
+      "id": "meta-pixel",
+      "name": "Meta Pixel (Facebook)",
+      "category": "Advertising",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["connect.facebook.net"],
+      "urlPatterns": ["/fbevents.js", "facebook.com/tr?id=", "facebook.com/tr/?id="],
+      "cookiePatterns": ["^_fbp", "^_fbc", "^fr$"]
+    },
+    {
+      "id": "linkedin-insight",
+      "name": "LinkedIn Insight Tag",
+      "category": "Advertising",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["snap.licdn.com", "px.ads.linkedin.com"],
+      "urlPatterns": ["/li.lms-analytics/insight.min.js"],
+      "cookiePatterns": ["^li_", "^bcookie", "^lidc", "^UserMatchHistory"]
+    },
+    {
+      "id": "microsoft-clarity",
+      "name": "Microsoft Clarity",
+      "category": "Session Replay",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["clarity.ms"],
+      "urlPatterns": ["clarity.ms/tag/"],
+      "cookiePatterns": ["^_clck", "^_clsk", "^CLID"]
+    },
+    {
+      "id": "hotjar",
+      "name": "Hotjar",
+      "category": "Session Replay",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["hotjar.com", "static.hotjar.com", "script.hotjar.com", "insights.hotjar.com"],
+      "urlPatterns": ["/hotjar-"],
+      "cookiePatterns": ["^_hj"]
+    },
+    {
+      "id": "hubspot",
+      "name": "HubSpot",
+      "category": "Marketing / CRM",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["js.hs-scripts.com", "js.hs-analytics.net", "js.hsforms.net", "track.hubspot.com", "hs-banner.com", "hscollectedforms.net"],
+      "urlPatterns": ["/hs-scripts.com/", "/__ptq.gif"],
+      "cookiePatterns": ["^hubspotutk", "^__hstc", "^__hssc", "^__hssrc", "^messagesUtk"]
+    },
+    {
+      "id": "callrail",
+      "name": "CallRail",
+      "category": "Call Tracking",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["callrail.com", "cdn.callrail.com"],
+      "urlPatterns": ["cdn.callrail.com/companies/"],
+      "cookiePatterns": ["^__cr", "^_cr_"]
+    },
+    {
+      "id": "intercom",
+      "name": "Intercom",
+      "category": "Live Chat",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["intercom.io", "widget.intercom.io", "intercomcdn.com", "js.intercomcdn.com"],
+      "urlPatterns": [],
+      "cookiePatterns": ["^intercom-"]
+    },
+    {
+      "id": "drift",
+      "name": "Drift",
+      "category": "Live Chat",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["drift.com", "js.driftt.com", "driftt.com", "customer.driftt.com"],
+      "urlPatterns": [],
+      "cookiePatterns": ["^drift_", "^driftt_"]
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube (embed)",
+      "category": "Video / Social",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["youtube.com", "youtube-nocookie.com", "ytimg.com", "googlevideo.com"],
+      "urlPatterns": ["/youtube.com/embed/", "/youtube-nocookie.com/embed/"],
+      "cookiePatterns": ["^VISITOR_INFO", "^YSC", "^__Secure-YT"]
+    },
+    {
+      "id": "vimeo",
+      "name": "Vimeo (embed)",
+      "category": "Video / Social",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["vimeo.com", "player.vimeo.com", "vimeocdn.com", "f.vimeocdn.com"],
+      "urlPatterns": ["player.vimeo.com/video/"],
+      "cookiePatterns": ["^vuid"]
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok Pixel",
+      "category": "Advertising",
+      "setsCookies": true,
+      "requiresConsent": true,
+      "domains": ["analytics.tiktok.com", "ttwstatic.com"],
+      "urlPatterns": ["/i18n/pixel/"],
+      "cookiePatterns": ["^_ttp", "^tt_"]
+    }
+  ]
+}

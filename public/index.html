@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>efelle · Privacy Scan</title>
+  <meta name="description" content="Scan a website for third-party trackers and cookies that fire before consent — a branded privacy review by efelle creative." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/report.css" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">efelle</span>
+        <span class="brand-sep">·</span>
+        <span class="brand-tool">Privacy Scan</span>
+      </div>
+      <a class="topbar-link" href="https://www.seattlewebdesign.com" target="_blank" rel="noopener">efelle creative ↗</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" id="hero">
+      <p class="eyebrow">Website privacy &amp; consent audit</p>
+      <h1 class="hero-title">See what loads <em>before</em> a visitor says yes.</h1>
+      <p class="hero-sub">
+        We load the homepage in a clean, cookie-less browser session and report every third-party
+        tracker, pixel, and cookie that fires before consent — then hand you a branded, client-ready
+        review and PDF.
+      </p>
+
+      <form id="scan-form" class="scan-card" autocomplete="off">
+        <div class="field">
+          <label for="url">Website URL</label>
+          <input id="url" name="url" type="text" placeholder="example.com" required />
+        </div>
+        <div class="field">
+          <label for="company">Client / company name</label>
+          <input id="company" name="company" type="text" placeholder="LMC Incorporated" />
+        </div>
+        <button type="submit" class="btn-primary" id="run-btn">Run scan →</button>
+      </form>
+      <p class="hero-note">A scan takes ~20–40 seconds. Only public http/https sites can be scanned.</p>
+    </section>
+
+    <section class="status" id="status" hidden>
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="status-text" id="status-text">Loading the site in a clean browser session…</p>
+    </section>
+
+    <section class="error-box" id="error-box" hidden>
+      <p id="error-text"></p>
+    </section>
+
+    <section class="results" id="results" hidden>
+      <div class="results-bar">
+        <div class="results-bar-left">
+          <span class="risk-chip" id="risk-chip"></span>
+          <span class="results-target" id="results-target"></span>
+        </div>
+        <div class="results-bar-right">
+          <span class="ai-badge" id="ai-badge" hidden>AI narrative</span>
+          <a class="btn-primary" id="pdf-btn" href="#" download>Download branded PDF</a>
+          <button class="btn-ghost" id="new-scan-btn" type="button">New scan</button>
+        </div>
+      </div>
+      <div class="report-card">
+        <div class="ps-report" id="report"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="sitefoot">
+    <span class="brand-mark">efelle</span> Privacy Scan · Not legal advice · Results reflect a single homepage load.
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

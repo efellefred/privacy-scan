@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.local
+reports/*.md
+reports/*.json
+reports/*.pdf
+!reports/.gitkeep
+npm-debug.log*
+.DS_Store

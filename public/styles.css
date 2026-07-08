@@ -1,0 +1,132 @@
+/* efelle Privacy Scan — app shell. Report internals are styled by /report.css.
+   Palette + type mirror the efelle content platform design system. */
+
+:root {
+  --bg: #FAFAF8;
+  --surface: #FFFFFF;
+  --surface-2: #F5F4F1;
+  --border: #E8E5E0;
+  --border-dark: #D1CCC5;
+  --text-primary: #0D1117;
+  --text-secondary: #4B5563;
+  --text-muted: #9CA3AF;
+  --accent: #F56300;
+  --accent-light: #FFF5EE;
+  --accent-dark: #C44D00;
+  --success: #10B981;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'Lora', Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+/* The [hidden] attribute must win over class-level display rules below. */
+[hidden] { display: none !important; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Top bar --- */
+.topbar { border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 10; }
+.topbar-inner { max-width: 1000px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+.brand { display: flex; align-items: baseline; gap: 8px; }
+.brand-mark { font-family: var(--font-serif); font-weight: 600; font-size: 20px; color: var(--accent); }
+.brand-sep { color: var(--border-dark); }
+.brand-tool { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-family: ui-monospace, monospace; }
+.topbar-link { font-size: 13px; color: var(--text-secondary); text-decoration: none; }
+.topbar-link:hover { color: var(--accent); }
+
+/* --- Layout --- */
+.wrap { flex: 1; max-width: 1000px; width: 100%; margin: 0 auto; padding: 40px 24px 60px; }
+
+/* --- Hero + form --- */
+.eyebrow { font-size: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin: 0 0 12px; }
+.hero-title { font-family: var(--font-serif); font-size: 40px; line-height: 1.12; font-weight: 600; margin: 0 0 16px; max-width: 640px; }
+.hero-title em { font-style: italic; color: var(--accent); }
+.hero-sub { color: var(--text-secondary); font-size: 17px; line-height: 1.6; max-width: 620px; margin: 0 0 28px; }
+
+.scan-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(13,17,23,0.04);
+  padding: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 16px;
+  align-items: end;
+  max-width: 720px;
+}
+.field { display: flex; flex-direction: column; }
+.field label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+.field input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 12px;
+  font-size: 15px;
+  font-family: var(--font-sans);
+  background: var(--surface);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.field input::placeholder { color: var(--text-muted); }
+.field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,99,0,0.14); }
+
+.btn-primary {
+  background: var(--accent); color: #fff; border: none;
+  border-radius: 10px; padding: 11px 20px;
+  font-size: 14px; font-weight: 600; font-family: var(--font-sans);
+  cursor: pointer; text-decoration: none; display: inline-block; white-space: nowrap;
+  transition: background .15s;
+}
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+.btn-ghost {
+  background: transparent; border: 1px solid var(--border-dark); color: var(--text-secondary);
+  border-radius: 10px; padding: 10px 16px; font-size: 13px; font-family: var(--font-sans);
+  cursor: pointer; transition: border-color .15s, color .15s;
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.hero-note { font-size: 13px; color: var(--text-muted); margin: 14px 0 0; }
+
+/* --- Status / loading --- */
+.status { display: flex; align-items: center; gap: 14px; margin-top: 32px; padding: 20px 22px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; max-width: 720px; }
+.spinner { width: 22px; height: 22px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; flex: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.status-text { margin: 0; color: var(--text-secondary); font-size: 15px; }
+
+/* --- Error --- */
+.error-box { margin-top: 24px; padding: 16px 18px; background: #FEECEC; border: 1px solid #EF444433; border-radius: 12px; color: #B91C1C; max-width: 720px; }
+.error-box p { margin: 0; font-size: 14px; }
+
+/* --- Results --- */
+.results { margin-top: 28px; scroll-margin-top: 72px; }
+.results-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.results-bar-left { display: flex; align-items: center; gap: 12px; }
+.results-bar-right { display: flex; align-items: center; gap: 10px; }
+.risk-chip { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 14px; }
+.results-target { color: var(--text-secondary); font-size: 14px; }
+.ai-badge { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-dark); background: var(--accent-light); border: 1px solid #F5630033; border-radius: 999px; padding: 4px 10px; }
+
+.report-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 1px 2px rgba(13,17,23,0.04); padding: 40px; }
+
+/* --- Footer --- */
+.sitefoot { border-top: 1px solid var(--border); padding: 18px 24px; text-align: center; color: var(--text-muted); font-size: 12.5px; }
+.sitefoot .brand-mark { font-size: 14px; }
+
+/* --- Responsive --- */
+@media (max-width: 720px) {
+  .scan-card { grid-template-columns: 1fr; }
+  .hero-title { font-size: 30px; }
+  .report-card { padding: 22px; }
+  .wrap { padding: 28px 16px 48px; }
+}
