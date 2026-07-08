@@ -51,7 +51,13 @@ body {
 .eyebrow { font-size: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin: 0 0 12px; }
 .hero-title { font-family: var(--font-serif); font-size: 40px; line-height: 1.12; font-weight: 600; margin: 0 0 16px; max-width: 640px; }
 .hero-title em { font-style: italic; color: var(--accent); }
-.hero-sub { color: var(--text-secondary); font-size: 17px; line-height: 1.6; max-width: 620px; margin: 0 0 28px; }
+.hero-sub { color: var(--text-secondary); font-size: 17px; line-height: 1.6; max-width: 620px; margin: 0 0 24px; }
+
+.scope-note { background: var(--accent-light); border: 1px solid rgba(245,99,0,0.14); border-left: 3px solid var(--accent); border-radius: 0 12px 12px 0; padding: 16px 18px; max-width: 720px; margin: 0 0 28px; }
+.scope-lead { font-weight: 600; margin: 0 0 8px; font-size: 15px; }
+.scope-list { margin: 0; padding-left: 20px; }
+.scope-list li { margin-bottom: 6px; color: var(--text-secondary); font-size: 14px; line-height: 1.5; }
+.scope-list strong { color: var(--text-primary); }
 
 .scan-card {
   background: var(--surface);

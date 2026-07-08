@@ -72,6 +72,16 @@ export function renderReportBody(data) {
     push(`<p class="ps-note">⚠ The page reported a load issue during capture: ${codeSpan(data.loadError)}. Results may be partial.</p>`);
   }
 
+  // --- Scope callout ---
+  push(`<div class="ps-scope">
+    <p class="ps-scope-lead">This is a privacy/consent tool — it addresses the technical evidence behind:</p>
+    <ul class="ps-scope-list">
+      <li><strong>GDPR + ePrivacy Directive</strong> (EU/UK “cookie law”) — the core check: are trackers/cookies firing before consent, is there a consent banner, is it opt-in vs. notice-only.</li>
+      <li><strong>CCPA/CPRA</strong> (California) — third-party data sharing, “Do Not Sell/Share,” privacy-policy disclosures.</li>
+      <li>General privacy-policy / cookie-policy hygiene.</li>
+    </ul>
+  </div>`);
+
   // --- Executive summary ---
   push(section('Executive summary', `<p>${esc(narrative.executiveSummary)}</p>`));
 
@@ -399,6 +409,11 @@ export const REPORT_CSS = `
 .ps-ok { color: #10B981; font-weight: 500; }
 .ps-danger { color: #EF4444; font-weight: 500; }
 .ps-note { background: #FEF6E7; border: 1px solid #F59E0B33; border-radius: 8px; padding: 10px 14px; font-size: 14px; }
+.ps-scope { background: #FFF5EE; border: 1px solid #F5630022; border-left: 3px solid #F56300; border-radius: 0 8px 8px 0; padding: 14px 16px; margin-top: 18px; }
+.ps-scope-lead { font-weight: 600; margin: 0 0 8px; }
+.ps-scope-list { margin: 0; padding-left: 20px; }
+.ps-scope-list li { margin-bottom: 6px; font-size: 14px; color: #4B5563; }
+.ps-scope-list strong { color: #0D1117; }
 .ps-disclaimer { font-size: 12.5px; color: #6B7280; background: #F5F4F1; border-radius: 8px; padding: 14px 16px; line-height: 1.55; }
 .ps-footer { margin-top: 32px; padding-top: 14px; border-top: 1px solid #E8E5E0; font-size: 12px; color: #9CA3AF; }
 @media (max-width: 560px) { .ps-meta { grid-template-columns: 1fr; } .ps-title { font-size: 24px; } }
