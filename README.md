@@ -82,9 +82,20 @@ Dockerfile             Container image (Playwright base — Chromium preinstalle
 
 ## Deploy
 
-The `Dockerfile` is based on Microsoft's Playwright image (Chromium + system
-libs preinstalled), so it runs anywhere that takes a container (Render,
-Railway, Fly, Cloud Run):
+**Live:** https://efelle-privacy-scan.up.railway.app — hosted on **Railway**
+(same platform as efelle Prospector; both are Node + headless-browser apps that
+need a long-running container, not serverless).
+
+Railway auto-detects the `Dockerfile` (Microsoft's Playwright image — Chromium +
+system libs preinstalled) and redeploys on every push to `main`. Config lives in
+the Railway dashboard, not the repo:
+
+1. Railway → **New Project → Deploy from GitHub repo → `efellefred/privacy-scan`**
+   (grant the Railway GitHub App access to the repo first, via *Configure GitHub App*).
+2. **Variables** → add `ANTHROPIC_API_KEY` (enables the AI narrative).
+3. **Settings → Networking → Generate Domain** for the public URL.
+
+Run the same image anywhere else that takes a container (Fly, Cloud Run):
 
 ```bash
 docker build -t privacy-scan .
