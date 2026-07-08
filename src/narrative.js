@@ -64,6 +64,13 @@ function factsFor(company, analysis) {
     hasCookiePolicy: analysis.hasCookiePolicy,
     vendors,
     riskFactors: analysis.risk.factors.map((f) => f.label),
+    consentInteraction: analysis.consentDelta
+      ? {
+          acceptButtonClicked: analysis.consentDelta.accepted,
+          newTrackersLoadedAfterAccepting: analysis.consentDelta.newVendors,
+          newThirdPartyDomainsAfterAccepting: analysis.consentDelta.newThirdPartyDomains.length,
+        }
+      : null,
   };
 }
 

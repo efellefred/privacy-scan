@@ -4,20 +4,61 @@
 import { isFirstParty, registrableDomain, unique } from './utils.js';
 
 /**
+ * Compute what additionally loaded after clicking "Accept" (before vs after
+ * consent). `detectFn` + `vendorsDb` are injected so this stays decoupled from
+ * the vendor module.
+ */
+export function computeConsentDelta(capture, detectedBefore, detectFn, vendorsDb) {
+  const { baseHost, requests, cookies, cookiesAfter = [], consent } = capture;
+  const afterRequests = requests.filter((r) => r.phase === 'after');
+
+  const beforeDomains = new Set(
+    requests.filter((r) => r.phase !== 'after' && !isFirstParty(r.host, baseHost))
+      .map((r) => registrableDomain(r.host)),
+  );
+  const newThirdPartyDomains = unique(
+    afterRequests.filter((r) => !isFirstParty(r.host, baseHost)).map((r) => registrableDomain(r.host)),
+  ).filter((d) => !beforeDomains.has(d)).sort();
+
+  const beforeCookieNames = new Set(cookies.map((c) => c.name));
+  const newCookies = cookiesAfter.filter((c) => !beforeCookieNames.has(c.name));
+
+  const detectedAfter = detectFn(vendorsDb, { requests: afterRequests, cookies: newCookies });
+  const beforeIds = new Set(detectedBefore.map((v) => v.id));
+  const newVendors = detectedAfter.filter((v) => !beforeIds.has(v.id)).map((v) => v.name);
+
+  return {
+    accepted: !!consent.accepted,
+    acceptMatchedBy: consent.acceptMatchedBy || null,
+    newThirdPartyDomains,
+    newCookies: newCookies.map((c) => c.name),
+    newVendors,
+    newRequestCount: afterRequests.length,
+  };
+}
+
+/**
  * @param {object} capture  output of scanner.scan()
  * @param {Array}  detectedVendors  output of vendors.detectVendors()
  */
 export function analyze(capture, detectedVendors) {
-  const { baseHost, requests, cookies, storage, consent, policyLinks, scripts } = capture;
+  const { baseHost, requests, cookies, storage, consent, policyLinks } = capture;
+
+  // Pre-consent analysis uses ONLY requests that fired before we clicked
+  // "Accept" (phase !== 'after'), so the "before consent" metrics stay accurate
+  // even though the capture also records post-consent requests for the delta.
+  const beforeRequests = requests.filter((r) => r.phase !== 'after');
 
   // --- Third-party breakdown -------------------------------------------------
-  const thirdPartyRequests = requests.filter((r) => !isFirstParty(r.host, baseHost));
+  const thirdPartyRequests = beforeRequests.filter((r) => !isFirstParty(r.host, baseHost));
   const thirdPartyDomains = unique(
     thirdPartyRequests.map((r) => registrableDomain(r.host)),
   ).sort();
 
   const thirdPartyScripts = unique(
-    scripts.filter((url) => !isFirstParty(url, baseHost)),
+    beforeRequests
+      .filter((r) => r.resourceType === 'script' && !isFirstParty(r.host, baseHost))
+      .map((r) => r.url),
   );
 
   // --- Cookies before consent ------------------------------------------------
@@ -56,7 +97,7 @@ export function analyze(capture, detectedVendors) {
   return {
     baseHost,
     counts: {
-      totalRequests: requests.length,
+      totalRequests: beforeRequests.length,
       thirdPartyRequests: thirdPartyRequests.length,
       thirdPartyDomains: thirdPartyDomains.length,
       cookies: cookies.length,

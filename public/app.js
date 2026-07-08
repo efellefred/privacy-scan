@@ -13,6 +13,7 @@ const report = $('report');
 const riskChip = $('risk-chip');
 const resultsTarget = $('results-target');
 const pdfBtn = $('pdf-btn');
+const devPdfBtn = $('dev-pdf-btn');
 const aiBadge = $('ai-badge');
 const newScanBtn = $('new-scan-btn');
 
@@ -95,7 +96,8 @@ function renderResults(payload) {
   riskChip.style.background = rc.bg;
 
   resultsTarget.textContent = payload.baseHost;
-  pdfBtn.href = `/api/report/${payload.id}.pdf`;
+  pdfBtn.href = `/api/report/${payload.id}/report.pdf`;
+  devPdfBtn.href = `/api/report/${payload.id}/dev.pdf`;
   aiBadge.hidden = payload.narrativeSource !== 'ai';
 
   hero.hidden = true;

@@ -46,9 +46,21 @@ client-facing prose (the "AI narrative" badge appears when it's active).
   Vimeo, TikTok) — defined in [`data/vendors.json`](data/vendors.json)
 - Whether a cookie consent banner appears
 - Whether trackers load **before** consent
+- What **additionally** loads after clicking "Accept" (before/after-consent comparison)
 - Whether privacy-policy and cookie-policy links exist
 
+**Scope:** this is a privacy/consent audit (GDPR, ePrivacy, CCPA/CPRA). It does
+**not** cover ADA / WCAG accessibility — that's a separate domain.
+
 ## The report
+
+Two branded PDF exports per scan:
+- **Client PDF** — the review below, in a client-facing voice.
+- **Developer PDF** — an implementation guide: prioritized fixes, per-vendor
+  gating instructions, cookies to defer, CMP setup, a starter CSP, and
+  acceptance criteria.
+
+Report sections:
 
 Executive summary · **Quick findings for {client}** · Risk level · Technologies
 detected · Third-party requests before consent · Cookies set before consent ·

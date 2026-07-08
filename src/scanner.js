@@ -58,6 +58,9 @@ export async function scan(targetUrl, { timeout = 30000, headless = true } = {})
 
   const requests = [];
   const scripts = [];
+  // Every request is tagged with the consent phase it fired in: 'before' (clean
+  // load, no consent) or 'after' (once we click "Accept"). Flips after the click.
+  let phase = 'before';
 
   // Record every request the page initiates.
   context.on('request', (req) => {
@@ -68,9 +71,10 @@ export async function scan(targetUrl, { timeout = 30000, headless = true } = {})
       host: hostOf(url),
       method: req.method(),
       resourceType: req.resourceType(),
+      phase,
     };
     requests.push(entry);
-    if (req.resourceType() === 'script') scripts.push(url);
+    if (req.resourceType() === 'script' && phase === 'before') scripts.push(url);
   });
 
   const page = await context.newPage();
@@ -127,6 +131,29 @@ export async function scan(targetUrl, { timeout = 30000, headless = true } = {})
 
   const title = await page.title().catch(() => '');
 
+  // --- Consent interaction: try to click "Accept", then re-capture --------
+  // Everything above is the pre-consent snapshot. Now flip to the 'after' phase
+  // and see what additionally loads once a visitor accepts.
+  const accept = await clickAcceptButton(page);
+  let cookiesAfter = cookies;
+  if (accept.clicked) {
+    phase = 'after';
+    await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(2500);
+    try {
+      cookiesAfter = (await context.cookies()).map((c) => ({
+        name: c.name,
+        domain: c.domain,
+        host: hostOf(c.domain),
+        httpOnly: c.httpOnly,
+        secure: c.secure,
+        sameSite: c.sameSite,
+        session: c.expires === -1,
+        firstParty: hostOf(c.domain).includes(baseHost) || baseHost.includes(hostOf(c.domain)),
+      }));
+    } catch { /* keep pre-consent cookies on failure */ }
+  }
+
   await browser.close();
 
   return {
@@ -137,10 +164,57 @@ export async function scan(targetUrl, { timeout = 30000, headless = true } = {})
     requests,
     scripts: [...new Set(scripts)],
     cookies,
+    cookiesAfter,
     storage,
-    consent,
+    consent: { ...consent, accepted: accept.clicked, acceptMatchedBy: accept.matchedBy },
     policyLinks,
   };
+}
+
+// Known CMP "accept all" buttons + generic accept-button text. Best-effort — a
+// site with no clickable accept simply reports consent as not accepted.
+const ACCEPT_SELECTORS = [
+  '#onetrust-accept-btn-handler',
+  '#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll',
+  '#CybotCookiebotDialogBodyButtonAccept',
+  '.cky-btn-accept',
+  '#cookiescript_accept',
+  '.osano-cm-accept-all',
+  '#hs-eu-confirmation-button',
+  '[aria-label*="accept all" i]',
+  '[aria-label*="accept cookies" i]',
+];
+
+const ACCEPT_TEXT = [
+  /^accept all( cookies)?$/i,
+  /^allow all( cookies)?$/i,
+  /^i (accept|agree)$/i,
+  /^accept( cookies)?$/i,
+  /^agree$/i,
+  /^got it$/i,
+];
+
+/** Try to click an "Accept" button in the consent banner. Returns {clicked, matchedBy}. */
+async function clickAcceptButton(page) {
+  for (const sel of ACCEPT_SELECTORS) {
+    try {
+      const el = page.locator(sel).first();
+      if ((await el.count()) && (await el.isVisible())) {
+        await el.click({ timeout: 2000 });
+        return { clicked: true, matchedBy: `selector:${sel}` };
+      }
+    } catch { /* try next */ }
+  }
+  for (const re of ACCEPT_TEXT) {
+    try {
+      const btn = page.getByRole('button', { name: re }).first();
+      if ((await btn.count()) && (await btn.isVisible())) {
+        await btn.click({ timeout: 2000 });
+        return { clicked: true, matchedBy: `text:${re.source}` };
+      }
+    } catch { /* try next */ }
+  }
+  return { clicked: false, matchedBy: null };
 }
 
 /** Look for a consent banner via known CMP selectors and generic cookie text. */

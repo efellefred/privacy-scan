@@ -1,14 +1,12 @@
 // Render the branded HTML report to a PDF buffer via headless Chromium.
 
 import { chromium } from 'playwright';
-import { renderReportDocument } from './report-html.js';
 
 /**
- * @param {object} data report data (see renderReportBody)
+ * @param {string} html a full standalone HTML document (see report-html.js)
  * @returns {Promise<Buffer>} PDF bytes
  */
-export async function renderPdf(data) {
-  const html = renderReportDocument(data);
+export async function renderPdf(html) {
   const browser = await chromium.launch({ headless: true });
   try {
     const page = await browser.newPage();

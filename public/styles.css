@@ -36,9 +36,10 @@ body {
 /* --- Top bar --- */
 .topbar { border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 10; }
 .topbar-inner { max-width: 1000px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
-.brand { display: flex; align-items: baseline; gap: 8px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-logo { display: block; border-radius: 50%; }
+.brand-logo-sm { display: inline-block; border-radius: 50%; vertical-align: text-bottom; opacity: 0.85; }
 .brand-mark { font-family: var(--font-serif); font-weight: 600; font-size: 20px; color: var(--accent); }
-.brand-sep { color: var(--border-dark); }
 .brand-tool { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-family: ui-monospace, monospace; }
 .topbar-link { font-size: 13px; color: var(--text-secondary); text-decoration: none; }
 .topbar-link:hover { color: var(--accent); }
@@ -94,6 +95,7 @@ body {
   background: transparent; border: 1px solid var(--border-dark); color: var(--text-secondary);
   border-radius: 10px; padding: 10px 16px; font-size: 13px; font-family: var(--font-sans);
   cursor: pointer; transition: border-color .15s, color .15s;
+  display: inline-block; text-decoration: none; white-space: nowrap;
 }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 .hero-note { font-size: 13px; color: var(--text-muted); margin: 14px 0 0; }

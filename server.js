@@ -10,9 +10,9 @@ import { randomUUID } from 'node:crypto';
 import { normalizeUrl, hostOf, isIpAddress } from './src/utils.js';
 import { scan } from './src/scanner.js';
 import { loadVendors, detectVendors } from './src/vendors.js';
-import { analyze } from './src/analyzer.js';
+import { analyze, computeConsentDelta } from './src/analyzer.js';
 import { generateNarrative } from './src/narrative.js';
-import { renderReportBody, REPORT_CSS } from './src/report-html.js';
+import { renderReportBody, renderReportDocument, renderDevReportDocument, REPORT_CSS } from './src/report-html.js';
 import { renderPdf } from './src/pdf.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -87,8 +87,12 @@ app.post('/api/scan', async (req, res) => {
   try {
     const capture = await scan(target, { timeout: 30000, headless: true });
     const vendors = await getVendors();
-    const detected = detectVendors(vendors, { requests: capture.requests, cookies: capture.cookies });
+    // Detect vendors from the pre-consent phase only, so the core analysis
+    // reflects what fired before the visitor accepted anything.
+    const beforeRequests = capture.requests.filter((r) => r.phase !== 'after');
+    const detected = detectVendors(vendors, { requests: beforeRequests, cookies: capture.cookies });
     const analysis = analyze(capture, detected);
+    analysis.consentDelta = computeConsentDelta(capture, detected, detectVendors, vendors);
     const narrative = await generateNarrative(company, analysis);
 
     const scannedAt = new Date().toISOString();
@@ -117,21 +121,27 @@ app.post('/api/scan', async (req, res) => {
   }
 });
 
-// --- Download the branded PDF ----------------------------------------------
-app.get('/api/report/:id.pdf', async (req, res) => {
+// --- Download PDFs ----------------------------------------------------------
+// Two variants: the client report and the developer implementation guide.
+async function sendPdf(req, res, kind) {
   const data = getResult(req.params.id);
   if (!data) return res.status(404).send('Report not found or expired. Please re-run the scan.');
   try {
-    const pdf = await renderPdf(data);
+    const html = kind === 'dev' ? renderDevReportDocument(data) : renderReportDocument(data);
+    const pdf = await renderPdf(html);
     const slug = hostOf(data.baseHost).replace(/[^a-z0-9.-]/gi, '_');
+    const name = kind === 'dev' ? `privacy-scan-${slug}-developer-guide.pdf` : `privacy-scan-${slug}.pdf`;
     res.set('Content-Type', 'application/pdf');
-    res.set('Content-Disposition', `attachment; filename="privacy-scan-${slug}.pdf"`);
+    res.set('Content-Disposition', `attachment; filename="${name}"`);
     res.send(pdf);
   } catch (err) {
     console.error('PDF generation failed:', err);
     res.status(500).send('PDF generation failed.');
   }
-});
+}
+
+app.get('/api/report/:id/report.pdf', (req, res) => sendPdf(req, res, 'client'));
+app.get('/api/report/:id/dev.pdf', (req, res) => sendPdf(req, res, 'dev'));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, ai: !!process.env.ANTHROPIC_API_KEY }));
 
