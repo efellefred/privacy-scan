@@ -486,6 +486,17 @@
         <div id="catBreakdown"></div>
       </div>
       <div class="card">
+        <h2>☁️ Family sync</h2>
+        <div class="field">
+          <label for="syncInput">Sync code</label>
+          <input id="syncInput" placeholder="Enter the family code" autocomplete="off">
+        </div>
+        <div class="backup-row">
+          <button id="syncSaveBtn">Turn on sync</button>
+        </div>
+        <p class="hint" id="syncStatus">Off — list is saved on this device only.</p>
+      </div>
+      <div class="card">
         <h2>💾 Backup</h2>
         <div class="backup-row">
           <button id="exportBtn">Export</button>
@@ -600,7 +611,13 @@
     added: 1
   }];
 
+  const SYNC_KEY = "olivias-sync-code";
+  const SAVED_AT_KEY = "olivias-shopping-savedAt";
+
   let items = load();
+  let savedAt = Number(localStorage.getItem(SAVED_AT_KEY)) || 0;
+  let syncCode = localStorage.getItem(SYNC_KEY) || "";
+  let pushTimer = null;
   let editingId = null;
   let fltStatus = "";
   let fltCategory = "";
@@ -619,7 +636,12 @@
     return seed.slice();
   }
   function save() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(items)); } catch (e) { /* storage blocked */ }
+    savedAt = Date.now();
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(items));
+      localStorage.setItem(SAVED_AT_KEY, String(savedAt));
+    } catch (e) { /* storage blocked */ }
+    schedulePush();
   }
 
   const $ = (id) => document.getElementById(id);
@@ -963,6 +985,77 @@
     };
     reader.readAsText(file);
   });
+
+  /* ---------- Cloud sync ---------- */
+  function setSyncStatus(msg, ok) {
+    const el = $("syncStatus");
+    el.textContent = msg;
+    el.style.color = ok ? "var(--good)" : "";
+  }
+
+  function schedulePush() {
+    if (!syncCode) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushToServer, 800);
+  }
+
+  async function pushToServer() {
+    if (!syncCode) return;
+    try {
+      setSyncStatus("Syncing…");
+      const r = await fetch("api/list", {
+        method: "PUT",
+        headers: { "content-type": "application/json", "x-sync-code": syncCode },
+        body: JSON.stringify({ savedAt, items })
+      });
+      if (r.status === 401) { setSyncStatus("Wrong sync code — check it and try again."); return; }
+      if (!r.ok) throw new Error(String(r.status));
+      setSyncStatus("Synced ✓ shared across your devices", true);
+    } catch (e) {
+      setSyncStatus("Offline — changes saved here, will sync later.");
+    }
+  }
+
+  async function pullFromServer() {
+    if (!syncCode) return;
+    try {
+      setSyncStatus("Syncing…");
+      const r = await fetch("api/list", { headers: { "x-sync-code": syncCode } });
+      if (r.status === 401) { setSyncStatus("Wrong sync code — check it and try again."); return; }
+      if (!r.ok) throw new Error(String(r.status));
+      const data = await r.json();
+      if (data && Array.isArray(data.items) && (data.savedAt || 0) > savedAt) {
+        items = data.items;
+        savedAt = data.savedAt || Date.now();
+        try {
+          localStorage.setItem(STORE_KEY, JSON.stringify(items));
+          localStorage.setItem(SAVED_AT_KEY, String(savedAt));
+        } catch (e) { /* storage blocked */ }
+        renderAll();
+      } else if (!data || (data.savedAt || 0) < savedAt) {
+        pushToServer();
+        return;
+      }
+      setSyncStatus("Synced ✓ shared across your devices", true);
+    } catch (e) {
+      setSyncStatus("Offline — using this device's copy.");
+    }
+  }
+
+  $("syncInput").value = syncCode;
+  $("syncSaveBtn").addEventListener("click", () => {
+    syncCode = $("syncInput").value.trim();
+    try { localStorage.setItem(SYNC_KEY, syncCode); } catch (e) { /* storage blocked */ }
+    if (!syncCode) {
+      setSyncStatus("Off — list is saved on this device only.");
+    } else {
+      pullFromServer();
+    }
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) pullFromServer();
+  });
+  if (syncCode) pullFromServer();
 
   /* ---------- Offline / installable ---------- */
   if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {

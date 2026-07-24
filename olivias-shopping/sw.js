@@ -1,4 +1,4 @@
-const CACHE = "olivias-shopping-v2";
+const CACHE = "olivias-shopping-v3";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -15,6 +15,7 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
+  if (new URL(e.request.url).pathname.includes("/api/")) return;
   e.respondWith(
     caches.match(e.request).then((cached) => {
       const fetched = fetch(e.request)
