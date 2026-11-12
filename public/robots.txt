@@ -1,0 +1,3 @@
+# efelle Privacy Scan: an internal efelle tool, not a public website. Search engines stay out.
+User-agent: *
+Disallow: /
